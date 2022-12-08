@@ -20,9 +20,9 @@ class LSTMModel:
     def create(self, total_words: int, output_dim, max_sequence_len):
         model = Sequential()
         model.add(Embedding(total_words, output_dim, input_length=max_sequence_len - 1))
-        model.add(Bidirectional(LSTM(256)))
+        model.add(Bidirectional(LSTM(256, dropout=0.1)))
         model.add(Dense(total_words, activation='softmax'))
-        optimizer = Adam(learning_rate=0.01)
+        optimizer = Adam(learning_rate=0.005)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics='accuracy')
         self.model = model
         return self
@@ -41,7 +41,7 @@ class LSTMModel:
         c = Lambda(lambda xin: k.sum(xin, axis=1), output_shape=(rnn_units,))(c)
         _out = Dense(total_words, activation='softmax', name='pitch')(c)
         model = Model([_in], [_out])
-        optimizer = Adam(learning_rate=0.01)
+        optimizer = Adam(learning_rate=0.001)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics='accuracy')
         self.model = model
         return self
