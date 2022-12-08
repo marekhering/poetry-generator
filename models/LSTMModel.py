@@ -1,3 +1,5 @@
+import typing as tp
+
 from keras import Sequential, Model
 from keras.models import load_model
 from keras.layers import Embedding, Bidirectional, LSTM, Dense, Reshape, Dropout, Activation, Permute, RepeatVector, \
@@ -12,26 +14,18 @@ class LSTMModel:
     MODEL_PATH = 'data/models/LSTMModel/weights.h5'
     MODEL_CHECKPOINT = 'data/models/LSTMModel/checkpoint'
 
-    def __init__(
-            self,
-            load: bool,
-            model_path: str = MODEL_PATH,
-            total_words: int = None,
-            max_sequence_len: int = None
-    ):
-        self.model: Model = None
-        if not load or (self.load(model_path)) is None:
-            assert total_words is not None and max_sequence_len is not None
-            self.create_with_attention(total_words, 1000, max_sequence_len)
+    def __init__(self):
+        self.model: tp.Optional[Model] = None
 
     def create(self, total_words: int, output_dim, max_sequence_len):
         model = Sequential()
         model.add(Embedding(total_words, output_dim, input_length=max_sequence_len - 1))
-        model.add(Bidirectional(LSTM(250)))
+        model.add(Bidirectional(LSTM(256)))
         model.add(Dense(total_words, activation='softmax'))
         optimizer = Adam(learning_rate=0.01)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics='accuracy')
         self.model = model
+        return self
 
     def create_with_attention(self, total_words: int, output_dim, max_sequence_len: int, rnn_units: int = 256):
         _in = Input(shape=(None,))
@@ -50,6 +44,7 @@ class LSTMModel:
         optimizer = Adam(learning_rate=0.01)
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics='accuracy')
         self.model = model
+        return self
 
     def train(self, X, y, epochs: int = 100, batch_size: int = 8):
         model_checkpoint = ModelCheckpoint(
@@ -62,11 +57,8 @@ class LSTMModel:
         self.model.save(_path or self.MODEL_PATH)
 
     def load(self, _path: str = None):
-        try:
-            self.model = load_model(_path or self.MODEL_PATH)
-            return self.model
-        except IOError:
-            return None
+        self.model = load_model(_path or self.MODEL_PATH)
+        return self
 
     def predict(self, X):
         predict_x = self.model.predict([X], verbose=0)
