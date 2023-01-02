@@ -1,6 +1,6 @@
 keras==2.10.0
-numpy==1.23.5
+numpy==1.23.4
 eng_to_ipa==0.0.2
 jupyter==1.0.0
-matplotlib==3.6.2
-tqdm
+matplotlib==3.6.1
+tqdm==4.64.1
