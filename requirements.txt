@@ -4,4 +4,4 @@ eng_to_ipa==0.0.2
 jupyter==1.0.0
 matplotlib==3.6.1
 tqdm==4.64.1
-pyspellchecker==0.7.1
+pyhyphen==4.0.3
